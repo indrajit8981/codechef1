@@ -1,0 +1,264 @@
+import java.io.*;
+import java.util.InputMismatchException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.*;
+
+class Solution {    
+    static int modInverse(int a, int m)
+    {
+        int m0 = m;
+        int y = 0, x = 1;
+ 
+        if (m == 1)
+            return 0;
+ 
+        while (a > 1)
+        {
+            // q is quotient
+            int q = a / m;
+ 
+            int t = m;
+ 
+            // m is remainder now, process
+            // same as Euclid's algo
+            m = a % m;
+            a = t;
+            t = y;
+ 
+            // Update x and y
+            y = x - q * y;
+            x = t;
+        }
+ 
+        // Make x positive
+        if (x < 0)
+            x += m0;
+ 
+        return x;
+    }
+//    1
+//17 5
+//1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+    static long power(int x, int y, int m)
+{
+    if (y == 0)
+        return 1;
+    long p = power(x, y/2, m) % m;
+    p = (p * p) % m;
+    return (y%2 == 0)? p : (x * p) % m;
+}
+    static int C[][]=new int[5001][5001];
+    static void binomialCoeff(int n, int k)
+{
+    
+    int i, j;
+ 
+    // Caculate value of Binomial Coefficient in bottom up manner
+    for (i = 0; i <= n; i++)
+    {
+        for (j = 0; j <= Math.min(i, k); j++)
+        {
+            // Base Cases
+            if (j == 0 || j == i)
+                C[i][j] = 1;
+ 
+            // Calculate value using previosly stored values
+            else
+                C[i][j] = (C[i-1][j-1] + C[i-1][j])%1000000006;
+        }
+    }
+ 
+}
+    public static void main(String[] args)
+    {
+    
+        InputReader in=new InputReader(System.in);
+    binomialCoeff(5000,5000);
+    //System.out.println(C[5000][2500]);
+        StringBuffer str=new StringBuffer();
+        int t,i,j,kk;
+        t=in.nextInt();        
+        for(i=0;i<t;i++){
+            int n=in.nextInt();
+            int k=in.nextInt();
+            int a[]=new int[n];
+            for(j=0;j<n;j++){
+                a[j]=in.nextInt();
+            }
+            Arrays.sort(a);
+            int z=k-3;
+            long value[]=new long[n+1];
+            for(j=0;j<=n-k;j++){
+                for(kk=j+k-1;kk<n;kk++){
+                    value[j+1]=(value[j+1]+C[kk-j-2][z])%1000000006;
+                    value[kk]=(value[kk]-C[kk-j-2][z]+1000000006)%1000000006;
+                }
+            }
+            //System.out.println("values"+(i+1));
+            
+            for(j=1;j<n+1;j++){
+                
+                value[j]=(value[j-1]+value[j])%1000000006;
+                //System.out.print(value[j]+" ");
+            }
+            //System.out.println();
+            //long fin=1;
+            BigInteger fin;
+            fin = new BigInteger("1");
+            BigInteger w = new BigInteger("1000000007");
+            
+            for(j=0;j<=n;j++){
+                if(value[j]<=0)
+                    continue;
+                 BigInteger bg=new BigInteger(Long.toString(a[j]));
+                BigInteger bg1=new BigInteger(Long.toString(value[j]));
+                //System.out.println(fin+" "+power(a[j],(int)value[j],1000000007)+" "+a[j]);
+                fin=fin.multiply(bg.modPow(bg1, w)).mod(w);
+            }
+            str.append(fin+"\n");
+        }
+        System.out.println(str);
+
+        }
+//1
+//5 3
+//2 3 4 5 6
+//7 4
+//1 2 3 4 5 6 7
+//1
+//8 7
+//8 7 6 5 4 3 2 1
+//9 6
+//1 2 3 4 5 6 7 8 9
+
+    static class InputReader{
+        private InputStream stream;
+        private byte[] buf = new byte[1024];
+        private int curChar;
+        private int numChars;
+ 
+        public InputReader(InputStream stream) {
+            this.stream = stream;
+        }
+ 
+        public int read() {
+            if (numChars == -1)
+                throw new UnknownError();
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    throw new UnknownError();
+                }
+                if (numChars <= 0)
+                    return -1;
+            }
+            return buf[curChar++];
+        }
+ 
+        public int peek() {
+            if (numChars == -1)
+                return -1;
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    return -1;
+                }
+                if (numChars <= 0)
+                    return -1;
+            }
+            return buf[curChar];
+        }
+ 
+        public void skip(int x) {
+            while (x-- > 0)
+                read();
+        }
+ 
+        public int nextInt() {
+            return Integer.parseInt(next());
+        }
+ 
+        public long nextLong() {
+            return Long.parseLong(next());
+        }
+ 
+        public String nextString() {
+            return next();
+        }
+ 
+        public String next() {
+            int c = read();
+            while (isSpaceChar(c))
+                c = read();
+            StringBuffer res = new StringBuffer();
+            do {
+                res.appendCodePoint(c);
+                c = read();
+            } while (!isSpaceChar(c));
+ 
+            return res.toString();
+        }
+ 
+        public String nextLine() {
+            StringBuffer buf = new StringBuffer();
+            int c = read();
+            while (c != '\n' && c != -1) {
+                if (c != '\r')
+                    buf.appendCodePoint(c);
+                c = read();
+            }
+            return buf.toString();
+        }
+ 
+        public double nextDouble() {
+            int c = read();
+            while (isSpaceChar(c))
+                c = read();
+            int sgn = 1;
+            if (c == '-') {
+                sgn = -1;
+                c = read();
+            }
+            double res = 0;
+            while (!isSpaceChar(c) && c != '.') {
+                if (c == 'e' || c == 'E')
+                    return res * Math.pow(10, nextInt());
+                if (c < '0' || c > '9')
+                    throw new InputMismatchException();
+                res *= 10;
+                res += c - '0';
+                c = read();
+            }
+            if (c == '.') {
+                c = read();
+                double m = 1;
+                while (!isSpaceChar(c)) {
+                    if (c == 'e' || c == 'E')
+                        return res * Math.pow(10, nextInt());
+                    if (c < '0' || c > '9')
+                        throw new InputMismatchException();
+                    m /= 10;
+                    res += (c - '0') * m;
+                    c = read();
+                }
+            }
+            return res * sgn;
+        }
+ 
+        public boolean hasNext() {
+            int value;
+            while (isSpaceChar(value = peek()) && value != -1)
+                read();
+            return value != -1;
+        }
+ 
+        private boolean isSpaceChar(int c) {
+            return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
+        }
+    }
+} 
