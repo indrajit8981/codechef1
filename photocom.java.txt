@@ -1,0 +1,668 @@
+
+import java.io.*;
+import java.util.InputMismatchException;
+import java.io.IOException;
+import java.util.*;
+
+class Solu {
+
+    static StringBuffer str = new StringBuffer();
+    static InputReader in = new InputReader(System.in);
+    static int mm = 1000000007;
+    static long aux[][];
+    static void preProcess(long mat[][], int M, int N) {
+        for (int i = 0; i < N; i++) {
+            aux[0][i] = mat[0][i];
+        }
+        for (int i = 1; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                aux[i][j] = mat[i][j]
+                        + aux[i - 1][j];
+            }
+        }
+        for (int i = 0; i < M; i++) {
+            for (int j = 1; j < N; j++) {
+                aux[i][j] += aux[i][j - 1];
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int it, t;
+        long i, j;
+        t = in.nextInt();
+        for (it = 0; it < t; it++) {
+            long h1 = in.nextLong();
+            long w1 = in.nextLong();
+            long a[][] = new long[(int)h1][(int)w1];
+            String s1 = in.next();
+            int c = 0;
+            for (i = 0; i < h1; i++) {
+                for (j = 0; j < w1; j++) {
+                    char ch = s1.charAt(c++);
+                    if (ch == '1') {
+                        a[(int) i][(int) j] = 1;
+                    } else {
+                        a[(int) i][(int) j] = 0;
+                    }
+                }
+            }
+            long h2 = in.nextInt();
+            long w2 = in.nextInt();
+            long b[][] = new long[(int)h2][(int)w2];
+            aux = new long[(int)h2][(int)w2];
+            s1 = in.next();
+            c = 0;
+            for (i = 0; i < h2; i++) {
+                for (j = 0; j < w2; j++) {
+                    char ch = s1.charAt(c++);
+                    if (ch == '1') {
+                        b[(int) i][(int) j] = 1;
+                    } else {
+                        b[(int) i][(int) j] = 0;
+                    }
+                }
+            }
+            preProcess(b, (int)h2, (int)w2);
+            long l1 = (h1 * h2) / gcd(h1, h2);
+            long l2 = (w1 * w2) / gcd(w1, w2);
+            long c1 = l1 / h1;
+            long c2 = l2 / w1;
+            long g1 = l1 / h2;
+            long g2 = l2 / w2;
+            long y1 = 0, y2 = 0;
+            long ol = 0, ou = 0;
+            long zz = 0, pp = 0;
+            long m, n;
+            long ss = 0;
+            long jj = 0;
+            for (i = 0; i < h1; i++) {
+                y2 = 0;
+                ol = 0;
+                long aw = 0, as = 0;
+                if (ou == 1) {
+                    long hf = (y1 + 1) * g1 - i * c1;
+                    if (hf > c1) {
+                        jj = y1;
+                        aw = 1;
+                    } else {
+                        long ya = c1 - hf;
+                        if (ya % g1 == 0) {
+                            jj = y1 + ya / g1;
+                            aw = 0;
+                        } else {
+                            jj = y1 + ya / g1 + 1;
+                            aw = 1;
+                        }
+                    }
+                } else {
+                    if (g1 > c1) {
+                        jj = y1;
+                        aw = 1;
+                    } else {
+                        if (c1 % g1 == 0) {
+                            aw = 0;
+                            jj = y1 + c1 / g1 - 1;
+                        } else {
+                            jj = y1 + c1 / g1;
+                            aw = 1;
+                        }
+                    }
+                }
+                for (j = 0; j < w1; j++) {
+                    long kk;
+                    if (ol == 1) {
+                        long hf = (y2 + 1) * g2 - j * c2;
+                        if (hf > c2) {
+                            kk = y2;
+                            as = 1;
+                        } else {
+                            long ya = c2 - hf;
+                            if (ya % g2 == 0) {
+                                kk = y2 + ya / g2;
+                                as = 0;
+                            } else {
+                                kk = y2 + ya / g2 + 1;
+                                as = 1;
+                            }
+                        }
+                    } else {
+                        if (g2 > c2) {
+                            kk = y2;
+                            as = 1;
+                        } else {
+                            if (c2 % g2 == 0) {
+                                as = 0;
+                                kk = y2 + c2 / g2 - 1;
+                            } else {
+                                as = 1;
+                                kk = y2 + c2 / g2;
+                            }
+                        }
+                    }
+                    if (y1 < jj && y2 < kk) {//Change
+                        if (a[(int) i][(int) j]==1) {
+                            long zzz = sumQuery(y1 + 1, y2 + 1, jj - 1, kk - 1);
+                            ss += zzz != -1 ? zzz * g1 * g2 : 0;
+                        } else {
+                            long zzz = sumQuery(y1 + 1, y2 + 1, jj - 1, kk - 1);
+                            ss += zzz != -1 ? ((jj - y1 - 1) * (kk - y2 - 1) - zzz) * g1 * g2 : 0;
+                        }
+                        if (ou == 0) {
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1, y2 + 1, y1, kk - 1);
+                                ss += zzz != -1 ? zzz * g1 * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(y1, y2 + 1, y1, kk - 1);
+                                ss += zzz != -1 ? ((kk - y2 - 1) - zzz) * g1 * g2 : 0;
+                            }
+                        } else {
+                            long ea = (y1 + 1) * g1 - c1 * i;
+                            if (ea > c1) {
+                                ea = c1;
+                            }
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1, y2 + 1, y1, kk - 1);
+                                ss += zzz != -1 ? zzz * ea * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(y1, y2 + 1, y1, kk - 1);
+                                ss += zzz != -1 ? ((kk - y2 - 1) - zzz) * ea * g2 : 0;
+                            }
+                        }
+                        if (aw == 0) {
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(jj, y2 + 1, jj, kk - 1);
+                                ss += zzz != -1 ? zzz * g1 * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(jj, y2 + 1, jj, kk - 1);
+                                ss += zzz != -1 ? ((kk - y2 - 1) - zzz) * g1 * g2 : 0;
+                            }
+                        } else {
+                            long ea = (i + 1) * c1 - (jj) * g1;
+                            if (ea > c1) {
+                                ea = c1;
+                            }
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(jj, y2 + 1, jj, kk - 1);
+                                ss += zzz != -1 ? zzz * ea * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(jj, y2 + 1, jj, kk - 1);
+                                ss += zzz != -1 ? ((kk - y2 - 1) - zzz) * ea * g2 : 0;
+                            }
+                        }
+                        if (ol == 0) {
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1 + 1, y2, jj - 1, y2);
+                                ss += zzz != -1 ? zzz * g1 * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(y1 + 1, y2, jj - 1, y2);
+                                ss += zzz != -1 ? ((jj - y1 - 1) - zzz) * g1 * g2 : 0;
+                            }
+                        } else {
+                            long ea = (y2 + 1) * g2 - c2 * j;
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1 + 1, y2, jj - 1, y2);
+                                ss += zzz != -1 ? zzz * g1 * ea : 0;
+                            } else {
+                                long zzz = sumQuery(y1 + 1, y2, jj - 1, y2);
+                                ss += zzz != -1 ? ((jj - y1 - 1) - zzz) * g1 * ea : 0;
+                            }
+                        }
+                        if (as == 0) {
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1 + 1, kk, jj - 1, kk);
+                                ss += zzz != -1 ? zzz * g1 * g2 : 0;
+                            } else {
+                                long zzz = sumQuery(y1 + 1, kk, jj - 1, kk);
+                                ss += zzz != -1 ? ((jj - y1 - 1) - zzz) * g1 * g2 : 0;
+                            }
+                        } else {
+                            long ea = c2 * (1 + j) - (kk) * g2;
+                            if (a[(int) i][(int) j]==1) {
+                                long zzz = sumQuery(y1 + 1, kk, jj - 1, kk);
+                                ss += zzz != -1 ? zzz * g1 * ea : 0;
+                            } else {
+                                long zzz = sumQuery(y1 + 1, kk, jj - 1, kk);
+                                ss += zzz != -1 ? ((jj - y1 - 1) - zzz) * g1 * ea : 0;
+                            }
+                        }
+                        if (ou == 1) {//corners
+                            long ea = (y1 + 1) * g1 - c1 * i;
+                            if (ol == 1) {
+                                long ev = (y2 + 1) * g2 - c2 * j;
+                                long zzz = sumQuery(y1, y2, y1, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long zzz = sumQuery(y1, y2, y1, y2);
+                                long ev = g2;
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                            if (as == 1) {
+                                long ev = c2 * (1 + j) - (kk) * g2;
+                                long zzz = sumQuery(y1, kk, y1, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(y1, kk, y1, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                        } else {
+                            long ea = g1;
+                            if (ol == 1) {
+                                long ev = (y2 + 1) * g2 - c2 * j;
+                                long zzz = sumQuery(y1, y2, y1, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long zzz = sumQuery(y1, y2, y1, y2);
+                                long ev = g2;
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                            if (as == 1) {
+                                long ev = c2 * (1 + j) - (kk) * g2;
+                                long zzz = sumQuery(y1, kk, y1, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(y1, kk, y1, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                        }
+                        if (aw == 1) {
+                            long ea = (i + 1) * c1 - (jj) * g1;
+                            if (ol == 1) {
+                                long ev = (y2 + 1) * g2 - c2 * j;
+                                long zzz = sumQuery(jj, y2, jj, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(jj, y2, jj, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                            if (as == 1) {
+                                long ev = c2 * (1 + j) - (kk) * g2;
+                                long zzz = sumQuery(jj, kk, jj, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(jj, kk, jj, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                        } else {
+                            long ea = g1;
+                            if (ol == 1) {
+                                long ev = (y2 + 1) * g2 - c2 * j;
+                                long zzz = sumQuery(jj, y2, jj, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(jj, y2, jj, y2);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                            if (as == 1) {
+                                long ev = c2 * (1 + j) - (kk) * g2;
+                                long zzz = sumQuery(jj, kk, jj, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            } else {
+                                long ev = g2;
+                                long zzz = sumQuery(jj, kk, jj, kk);
+                                if (a[(int) i][(int) j]==1) {
+                                    ss += zzz != -1 ? zzz * ea * ev : 0;
+                                } else {
+                                    ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                                }
+                            }
+                        }
+                    }
+                    if (y1 == jj && y2 == kk) {//single element
+                        long ea = 0;
+                        ea = (y1 + 1) * g1 - c1 * i;
+                        if (ea > c1) {
+                            ea = c1;
+                        }
+                        long ev = (y2 + 1) * g2 - c2 * j;
+                        if (ev > c2) {
+                            ev = c2;
+                        }
+                        long zzz = sumQuery(y1, y2, y1, y2);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                        }
+                    }
+                    if (y1 == jj && y2 != kk) {
+                        long ea = 0;
+                        long ev = 0;
+                        if (ou == 1) {
+                            ea = (y1 + 1) * g1 - c1 * i;
+                        } else {
+                            ea = g1;
+                        }
+                        if (ea > c1) {
+                            ea = c1;
+                        }
+                        ev = g2;
+                        long zzz = sumQuery(y1, y2 + 1, y1, kk - 1);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? ((kk - y2 - 1) - zzz) * ea * ev : 0;
+                        }
+                        if (ol == 1) {
+                            ev = (y2 + 1) * g2 - c2 * j;
+                        } else {
+                            ev = g2;
+                        }
+                        zzz = sumQuery(y1, y2, y1, y2);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                        }
+                        if (as == 1) {
+                            ev = c2 * (1 + j) - (kk) * g2;
+                        } else {
+                            ev = g2;
+                        }
+                        zzz = sumQuery(y1, kk, y1, kk);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                        }
+                    }
+                    if (y1 != jj && y2 == kk) {
+                        long ea = 0;
+                        long ev = 0;
+                        if (ol == 1) {
+                            ev = (y2 + 1) * g2 - c2 * j;
+                        } else {
+                            ev = g2;
+                        }
+                        if (ev > c2) {
+                            ev = c2;
+                        }
+                        ea = g1;
+                        long zzz = sumQuery(y1 + 1, y2, jj - 1, y2);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? ((jj - y1 - 1) - zzz) * ea * ev : 0;
+                        }
+                        if (ou == 1) {
+                            ea = (y1 + 1) * g1 - c1 * i;
+                        } else {
+                            ea = g1;
+                        }
+                        if (ea > c1) {
+                            ea = c1;
+                        }
+                        zzz = sumQuery(y1, y2, y1, y2);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                        }
+                        if (aw == 1) {
+                            ea = (i + 1) * c1 - (jj) * g1;
+                        } else {
+                            ea = g1;
+                        }
+                        if (ea > c1) {
+                            ea = c1;
+                        }
+                        zzz = sumQuery(jj, y2, jj, y2);
+                        if (a[(int) i][(int) j]==1) {
+                            ss += zzz != -1 ? zzz * ea * ev : 0;
+                        } else {
+                            ss += zzz != -1 ? (1 - zzz) * ea * ev : 0;
+                        }
+                    }
+                    ol = as;
+                    y2 = as == 1 ? kk : kk + 1;
+                }
+                ou = aw;
+                y1 = aw == 1 ? jj : jj + 1;
+            }
+            ap(ss + "\n");
+        }
+        pn();
+    }
+
+    static long sumQuery(long tli, long tlj, long rbi, long rbj) {
+        if (tli < 0 || tlj < 0 || rbi < 0 || rbj < 0 || tli >= aux.length || tlj >= aux[0].length || rbi >= aux.length || rbj >= aux[0].length || tli > rbi || tlj > rbj) {
+            return -1;
+        }
+        long res = aux[(int) rbi][(int) rbj];
+        if (tli > 0) {
+            res = res - aux[(int) tli - 1][(int) rbj];
+        }
+        if (tlj > 0) {
+            res = res - aux[(int) rbi][(int) tlj - 1];
+        }
+        if (tli > 0 && tlj > 0) {
+            res = res + aux[(int) tli - 1][(int) tlj - 1];
+        }
+        return res;
+    }
+
+    static long gcd(long a, long b) {
+        return (b == 0) ? a : gcd(b, a % b);
+    }
+
+    static int gcdi(int a, int b) {
+        return (b == 0) ? a : gcdi(b, a % b);
+    }
+
+    public static void ap(String st) {
+        str.append(st);
+    }
+
+    public static void pn() {
+        System.out.println(str);
+    }
+
+    static class InputReader {
+
+        private InputStream stream;
+        private byte[] buf = new byte[1024];
+        private int curChar;
+        private int numChars;
+
+        public InputReader(InputStream stream) {
+            this.stream = stream;
+        }
+
+        public int read() {
+            if (numChars == -1) {
+                throw new UnknownError();
+            }
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    throw new UnknownError();
+                }
+                if (numChars <= 0) {
+                    return -1;
+                }
+            }
+            return buf[curChar++];
+        }
+
+        public int peek() {
+            if (numChars == -1) {
+                return -1;
+            }
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    return -1;
+                }
+                if (numChars <= 0) {
+                    return -1;
+                }
+            }
+            return buf[curChar];
+        }
+
+        public void skip(int x) {
+            while (x-- > 0) {
+                read();
+            }
+        }
+
+        public int nextInt() {
+            return Integer.parseInt(next());
+        }
+
+        public long nextLong() {
+            return Long.parseLong(next());
+        }
+
+        public String nextString() {
+            return next();
+        }
+
+        public String next() {
+            int c = read();
+            while (isSpaceChar(c)) {
+                c = read();
+            }
+            StringBuffer res = new StringBuffer();
+            do {
+                res.appendCodePoint(c);
+                c = read();
+            } while (!isSpaceChar(c));
+
+            return res.toString();
+        }
+
+        public String nextLine() {
+            StringBuffer buf = new StringBuffer();
+            int c = read();
+            while (c != '\n' && c != -1) {
+                if (c != '\r') {
+                    buf.appendCodePoint(c);
+                }
+                c = read();
+            }
+            return buf.toString();
+        }
+
+        public double nextDouble() {
+            int c = read();
+            while (isSpaceChar(c)) {
+                c = read();
+            }
+            int sgn = 1;
+            if (c == '-') {
+                sgn = -1;
+                c = read();
+            }
+            double res = 0;
+            while (!isSpaceChar(c) && c != '.') {
+                if (c == 'e' || c == 'E') {
+                    return res * Math.pow(10, nextInt());
+                }
+                if (c < '0' || c > '9') {
+                    throw new InputMismatchException();
+                }
+                res *= 10;
+                res += c - '0';
+                c = read();
+            }
+            if (c == '.') {
+                c = read();
+                double m = 1;
+                while (!isSpaceChar(c)) {
+                    if (c == 'e' || c == 'E') {
+                        return res * Math.pow(10, nextInt());
+                    }
+                    if (c < '0' || c > '9') {
+                        throw new InputMismatchException();
+                    }
+                    m /= 10;
+                    res += (c - '0') * m;
+                    c = read();
+                }
+            }
+            return res * sgn;
+        }
+
+        public boolean hasNext() {
+            int value;
+            while (isSpaceChar(value = peek()) && value != -1) {
+                read();
+            }
+            return value != -1;
+        }
+
+        private boolean isSpaceChar(int c) {
+            return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
+        }
+    }
+}
