@@ -1,0 +1,352 @@
+import java.io.*;
+import java.util.InputMismatchException;
+import java.io.IOException;
+import java.util.*;
+
+class Solution {    
+    static class DisjointUnionSets
+    {
+        int[] rank, parent;
+        int n;
+        public DisjointUnionSets(int n)
+        {
+            rank = new int[n];
+            parent = new int[n];
+            this.n = n;
+            makeSet();
+        }
+        void makeSet()
+        {
+            for (int i=0; i<n; i++)
+                parent[i] = i;
+        }
+        int find(int x)
+        {
+            if (parent[x]!=x)
+                parent[x] = find(parent[x]);
+            return parent[x];
+        }
+        void union(int x, int y)
+        {
+            int xRoot = find(x), yRoot = find(y);
+            if (xRoot == yRoot)
+                return;
+            if (rank[xRoot] < rank[yRoot])
+                parent[xRoot] = yRoot;
+            else if (rank[yRoot] < rank[xRoot])
+                parent[yRoot] = xRoot;
+     
+            else
+            {
+                parent[yRoot] = xRoot;
+                rank[xRoot] = rank[xRoot] + 1;
+            }
+        }
+    }
+    public static void main(String[] args)
+    {
+    
+        InputReader in=new InputReader(System.in);
+    
+        StringBuffer str=new StringBuffer();
+           int n,m,i,j;
+           n=in.nextInt();
+           m=in.nextInt();
+           DisjointUnionSets ds = new DisjointUnionSets(n+1);
+           int gr[]=new int[n+1];
+           for(i=1;i<=n;i++){
+               gr[i]=in.nextInt();
+           }
+           //BitSet bt=new BitSet();
+           //HashMap<Integer,BitSet[]> hm=new HashMap<>();
+           BitSet hm1[]=new BitSet[n+1];
+           BitSet hm2[]=new BitSet[n+1];
+           boolean block[]=new boolean[n+1];
+           boolean keys[]=new boolean[n+1];
+           for(i=0;i<m;i++){
+//               System.out.println(i+1);
+//               if(i==9)
+//                   System.out.println(str);
+               int t=in.nextInt();
+               if(t==1){
+                   gr[in.nextInt()]=in.nextInt();
+               }
+               if(t==2){
+                   int x=in.nextInt();
+                   int y=in.nextInt();
+                   int vv=ds.find(x);
+                   int yy=ds.find(y);
+                   ds.union(x, y);
+                   int zz=ds.find(y);
+                   if(vv!=yy){
+                       if(keys[zz]==false){
+                           hm1[zz]=new BitSet();
+                           hm2[zz]=new BitSet();
+                           hm1[zz].set(x);
+                           hm2[zz].set(y);
+                           keys[zz]=true;
+                       }
+                       else{
+                           if(zz==vv){
+                           if(keys[yy]==false){
+                               //BitSet bbt[]=hm.get(vv);
+                               if(hm1[vv].get(x)==true){
+                                   hm2[vv].set(y);
+                                   //hm.put(zz,bbt);
+                               }else{
+                                   hm1[vv].set(y);
+                                  // hm.put(zz,bbt);
+                               }                               
+                           }else{
+                               //BitSet bbt[]=hm.get(vv);
+                               //BitSet bbt1[]=hm.get(yy);
+                               if(hm1[vv].get(x)==true && hm1[yy].get(y)==false){
+                                   hm1[vv].or(hm1[yy]);
+                                   hm2[vv].or(hm2[yy]);
+                               }else{
+                                   if(hm1[vv].get(x)==true && hm2[yy].get(y)==false){
+                                       hm1[vv].or(hm2[yy]);
+                                       hm2[vv].or(hm1[yy]);
+                                   }else{
+                                       if(hm2[vv].get(x)==true && hm1[yy].get(y)==false){
+                                           hm1[vv].or(hm2[yy]);
+                                           hm2[vv].or(hm1[yy]);
+                                       }
+                                       else{
+                                           hm1[vv].or(hm1[yy]);
+                                           hm2[vv].or(hm2[yy]);
+                                       }
+                                   }
+                               }
+                           }
+                       }else{
+                               if(keys[vv]==false){
+                               //BitSet bbt[]=hm.get(yy);
+                               if(hm1[yy].get(y)==true){
+                                   hm2[yy].set(x);
+                                   //hm.put(zz,bbt);
+                               }else{
+                                   hm1[yy].set(x);
+                                   //hm.put(zz,bbt);
+                               }                               
+                           }else{
+                               //BitSet bbt[]=hm.get(yy);
+                               //BitSet bbt1[]=hm.get(vv);
+                               if(hm1[yy].get(y)==true && hm1[vv].get(x)==false){
+                                   hm1[yy].or(hm1[vv]);
+                                   hm2[yy].or(hm2[vv]);
+                               }else{
+                                   if(hm1[yy].get(y)==true && hm2[vv].get(x)==false){
+                                       hm1[yy].or(hm2[vv]);
+                                       hm2[yy].or(hm1[vv]);
+                                   }else{
+                                       if(hm2[yy].get(y)==true && hm1[vv].get(x)==false){
+                                           hm1[yy].or(hm2[vv]);
+                                           hm2[yy].or(hm1[vv]);
+                                       }
+                                       else{
+                                           hm1[yy].or(hm1[vv]);
+                                           hm2[yy].or(hm2[vv]);
+                                       }
+                                   }
+                               }
+                           }
+                           }
+                           if(block[x]|| block[y]||block[vv]||block[yy]){
+                               block[x]=true;
+                               block[y]=true;
+                               block[vv]=true;
+                               block[yy]=true;
+                           }
+                       }
+                   }else{
+                       //BitSet bbt[]=hm.get(vv);
+                       if(hm1[vv].get(x)==true && hm1[vv].get(y)==true){
+                               block[x]=true;
+                               block[y]=true;
+                               block[vv]=true;
+                   }else{
+                           if(hm2[vv].get(x)==true && hm2[vv].get(y)==true){
+                               block[x]=true;
+                               block[y]=true;
+                               block[vv]=true;
+                           }
+                       }
+                   }
+               }
+               if(t==3){
+                   //System.out.println("Entered");
+                   int x=in.nextInt();
+                   int y=in.nextInt();
+                   int vv=in.nextInt();
+                   int zz=ds.find(y);
+                   int yy=ds.find(x);
+                   if(zz==yy && block[yy]==false){
+                       //BitSet bbt[]=hm.get(zz);
+                       long num=((long)vv)*gr[x];
+                       long denom=gr[y];
+                       long gc=gcd(Math.min(num,denom),Math.max(num,denom));
+                       num=num/gc;
+                       denom=denom/gc;
+                       if((hm1[zz].get(x) && hm1[zz].get(y))||(hm2[zz].get(x) && hm2[zz].get(y))){
+                           str.append(num+"/"+denom+"\n");
+                       }else{
+                           str.append("-"+num+"/"+denom+"\n");
+                       }
+                   }else{
+                       str.append(0+"\n");
+                   }
+               }
+           }
+System.out.println(str);
+        }
+    public static long gcd(long p, long q) {
+        if (q == 0) return p;
+        if (p == 0) return q;
+
+        // p and q even
+        if ((p & 1) == 0 && (q & 1) == 0) return gcd(p >> 1, q >> 1) << 1;
+
+        // p is even, q is odd
+        else if ((p & 1) == 0) return gcd(p >> 1, q);
+
+        // p is odd, q is even
+        else if ((q & 1) == 0) return gcd(p, q >> 1);
+
+        // p and q odd, p >= q
+        else if (p >= q) return gcd((p-q) >> 1, q);
+
+        // p and q odd, p < q
+        else return gcd(p, (q-p) >> 1);
+    }
+
+    static class InputReader{
+        private InputStream stream;
+        private byte[] buf = new byte[1024];
+        private int curChar;
+        private int numChars;
+ 
+        public InputReader(InputStream stream) {
+            this.stream = stream;
+        }
+ 
+        public int read() {
+            if (numChars == -1)
+                throw new UnknownError();
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    throw new UnknownError();
+                }
+                if (numChars <= 0)
+                    return -1;
+            }
+            return buf[curChar++];
+        }
+ 
+        public int peek() {
+            if (numChars == -1)
+                return -1;
+            if (curChar >= numChars) {
+                curChar = 0;
+                try {
+                    numChars = stream.read(buf);
+                } catch (IOException e) {
+                    return -1;
+                }
+                if (numChars <= 0)
+                    return -1;
+            }
+            return buf[curChar];
+        }
+ 
+        public void skip(int x) {
+            while (x-- > 0)
+                read();
+        }
+ 
+        public int nextInt() {
+            return Integer.parseInt(next());
+        }
+ 
+        public long nextLong() {
+            return Long.parseLong(next());
+        }
+ 
+        public String nextString() {
+            return next();
+        }
+ 
+        public String next() {
+            int c = read();
+            while (isSpaceChar(c))
+                c = read();
+            StringBuffer res = new StringBuffer();
+            do {
+                res.appendCodePoint(c);
+                c = read();
+            } while (!isSpaceChar(c));
+ 
+            return res.toString();
+        }
+ 
+        public String nextLine() {
+            StringBuffer buf = new StringBuffer();
+            int c = read();
+            while (c != '\n' && c != -1) {
+                if (c != '\r')
+                    buf.appendCodePoint(c);
+                c = read();
+            }
+            return buf.toString();
+        }
+ 
+        public double nextDouble() {
+            int c = read();
+            while (isSpaceChar(c))
+                c = read();
+            int sgn = 1;
+            if (c == '-') {
+                sgn = -1;
+                c = read();
+            }
+            double res = 0;
+            while (!isSpaceChar(c) && c != '.') {
+                if (c == 'e' || c == 'E')
+                    return res * Math.pow(10, nextInt());
+                if (c < '0' || c > '9')
+                    throw new InputMismatchException();
+                res *= 10;
+                res += c - '0';
+                c = read();
+            }
+            if (c == '.') {
+                c = read();
+                double m = 1;
+                while (!isSpaceChar(c)) {
+                    if (c == 'e' || c == 'E')
+                        return res * Math.pow(10, nextInt());
+                    if (c < '0' || c > '9')
+                        throw new InputMismatchException();
+                    m /= 10;
+                    res += (c - '0') * m;
+                    c = read();
+                }
+            }
+            return res * sgn;
+        }
+ 
+        public boolean hasNext() {
+            int value;
+            while (isSpaceChar(value = peek()) && value != -1)
+                read();
+            return value != -1;
+        }
+ 
+        private boolean isSpaceChar(int c) {
+            return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
+        }
+    }
+} 
